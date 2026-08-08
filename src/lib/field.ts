@@ -22,14 +22,14 @@ export namespace Field {
 
   export function update(
     field: Field,
-    i: number,
-    j: number,
+    x: number,
+    y: number,
     updating: ((element: Element) => Element),
   ): Field {
     return immutableUpdate(field, {
-      [i]: {
+      [y]: {
         $apply: (row: Element[]) => immutableUpdate(row, {
-          [j]: {
+          [x]: {
             $apply: updating
           }
         })

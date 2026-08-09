@@ -4,7 +4,7 @@ import { Option } from "@fering-org/functional-helper"
 import { ElementId, Field, FieldElement } from "../../src/lib/field"
 
 describe("Field.update", () => {
-  it("update empty", async () => {
+  it("place new element", async () => {
     const elementId = ElementId.create(new Date(0))
     const element = FieldElement.create(elementId)
     const elementVector = { x: 1, y: 0 }
@@ -26,7 +26,7 @@ describe("Field.update", () => {
         })(),
       } as Field)
   })
-  it("update fill to null", async () => {
+  it("remove element", async () => {
     const elementId = ElementId.create(new Date(0))
     const element = FieldElement.create(elementId)
     const elementVector = { x: 1, y: 0 }

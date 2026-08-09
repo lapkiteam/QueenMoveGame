@@ -79,7 +79,16 @@ export namespace Field {
       }
     })
     if (updatedElement === undefined) {
-      return updatedField
+      if (currentElement === undefined) {
+        return updatedField
+      }
+      return immutableUpdate(updatedField, {
+        elements: {
+          $apply: (elements: Field["elements"]) => immutableUpdate(elements, {
+            $remove: [currentElement]
+          })
+        },
+      })
     }
     return immutableUpdate(updatedField, {
       elements: {

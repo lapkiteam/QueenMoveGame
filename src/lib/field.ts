@@ -28,6 +28,13 @@ export namespace FieldElement {
     UnionCase.mkUnionCase
     return Option.mkSome(element)
   }
+
+  export function getValue(element: FieldElement): ElementId {
+    if (element === undefined) {
+      throw new Error()
+    }
+    return element
+  }
 }
 
 export type Vector = {
@@ -78,6 +85,7 @@ export namespace Field {
         }
       }
     })
+
     if (updatedElement === undefined) {
       if (currentElement === undefined) {
         return updatedField
@@ -90,7 +98,22 @@ export namespace Field {
         },
       })
     }
-    return immutableUpdate(updatedField, {
+
+    const updatedField2 = (() => {
+      if (currentElement === undefined) {
+        return updatedField
+      }
+      if (currentElement === updatedElement) {
+        return updatedField
+      }
+      return immutableUpdate(updatedField, {
+        elements: {
+          $remove: [currentElement]
+        }
+      })
+    })()
+
+    return immutableUpdate(updatedField2, {
       elements: {
         $apply: (elements: Field["elements"]) => immutableUpdate(elements, {
           [updatedElement]: {

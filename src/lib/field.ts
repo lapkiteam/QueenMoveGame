@@ -1,39 +1,94 @@
+import { Option, UnionCase } from "@fering-org/functional-helper"
 import immutableUpdate from "immutability-helper"
 
-export type Element = boolean
+export type ElementId = string
 
-export type Field = Element[][]
+export namespace ElementId {
+  export function create(): ElementId
+  export function create(date: Date): ElementId
+  export function create(date?: Date): ElementId {
+    return (() => {
+      if (date === undefined) {
+        return new Date()
+      }
+      return date
+    })().valueOf().toString()
+  }
+}
+
+export type FieldElement = Option<ElementId>
+
+export namespace FieldElement {
+  export function create(): FieldElement
+  export function create(element: ElementId): FieldElement
+  export function create(element?: ElementId): FieldElement {
+    if (element === undefined) {
+      return Option.mkNone()
+    }
+    UnionCase.mkUnionCase
+    return Option.mkSome(element)
+  }
+}
+
+export type Vector = {
+  x: number,
+  y: number,
+}
+
+export type Field = {
+  elements: Map<ElementId, Vector>
+  field: FieldElement[][]
+}
 
 export namespace Field {
   export function create(
     width: number,
     height: number,
   ): Field {
-    const xss = Array<Element[]>(height)
-    for (let i = 0; i < xss.length; i++) {
-      const xs = Array<Element>(width)
+    const field = Array<FieldElement[]>(height)
+    for (let i = 0; i < field.length; i++) {
+      const xs = Array<FieldElement>(width)
       for (let j = 0; j < xs.length; j++) {
-        xs[j] = false
+        xs[j] = Option.mkNone()
       }
-      xss[i] = xs
+      field[i] = xs
     }
-    return xss
+    return {
+      elements: new Map(),
+      field,
+    }
   }
 
   export function update(
     field: Field,
-    x: number,
-    y: number,
-    updating: ((element: Element) => Element),
+    vector: Vector,
+    updating: ((element: FieldElement) => FieldElement),
   ): Field {
-    return immutableUpdate(field, {
-      [y]: {
-        $apply: (row: Element[]) => immutableUpdate(row, {
-          [x]: {
-            $apply: updating
+    const { x, y } = vector
+    const currentElement = field.field[y][x]
+    const updatedElement = updating(currentElement)
+    const updatedField = immutableUpdate(field, {
+      field: {
+        [y]: {
+          $apply: (row: FieldElement[]) => immutableUpdate(row, {
+            [x]: {
+              $set: updatedElement
+            }
+          })
+        }
+      }
+    })
+    if (updatedElement === undefined) {
+      return updatedField
+    }
+    return immutableUpdate(updatedField, {
+      elements: {
+        $apply: (elements: Field["elements"]) => immutableUpdate(elements, {
+          [updatedElement]: {
+            $set: vector
           }
         })
-      }
+      },
     })
   }
 }

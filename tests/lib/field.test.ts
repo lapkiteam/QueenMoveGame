@@ -23,7 +23,7 @@ export namespace ArrayExt {
 }
 
 describe("Field.update", () => {
-  it("place new element", async () => {
+  it("place new element", () => {
     const elementId = ElementId.create(new Date(0))
     const element = FieldElement.create(elementId)
     const elementVector = { x: 1, y: 0 }
@@ -45,7 +45,7 @@ describe("Field.update", () => {
         })(),
       } as Field)
   })
-  it("remove element", async () => {
+  it("remove element", () => {
     const elementId = ElementId.create(new Date(0))
     const element = FieldElement.create(elementId)
     const elementVector = { x: 1, y: 0 }
@@ -67,7 +67,7 @@ describe("Field.update", () => {
         field: Field.create(width, height).field,
       } as Field)
   })
-  it("replace old element to new element", async () => {
+  it("replace old element to new element", () => {
     const element1 = FieldElement.create(
       ElementId.create(new Date(0))
     )
@@ -103,7 +103,7 @@ describe("Field.update", () => {
 })
 
 describe("Field.getIntersections", () => {
-  it("counts", async () => {
+  it("counts", () => {
     const cols: (" " | "I" | "x")[][] = [
       ["I", " ", "I", " "],
       [" ", " ", " ", "I"],

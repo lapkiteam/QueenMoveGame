@@ -1,6 +1,16 @@
 import { Option, UnionCase } from "@fering-org/functional-helper"
 import immutableUpdate from "immutability-helper"
 
+export namespace Option2 {
+  // refactor: use `Option.get` (see. [feat(Option): add `get` function](https://github.com/gretmn102/functional-helper/issues/12))
+  export function get<T>(opt: Option<T>): T {
+    if (opt === undefined) {
+      throw new Error("Argument is undefined")
+    }
+    return opt
+  }
+}
+
 export type ElementId = string
 
 export namespace ElementId {
@@ -30,13 +40,11 @@ export namespace FieldElement {
   }
 
   export function getValue(element: FieldElement): ElementId {
-    if (element === undefined) {
-      throw new Error()
-    }
-    return element
+    return Option2.get(element)
   }
 }
 
+// refactor: rename to Position
 export type Vector = {
   x: number,
   y: number,

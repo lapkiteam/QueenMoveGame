@@ -44,14 +44,13 @@ export namespace FieldElement {
   }
 }
 
-// refactor: rename to Position
-export type Vector = {
+export type Position = {
   x: number,
   y: number,
 }
 
 export type Field = {
-  elements: Map<ElementId, Vector>
+  elements: Map<ElementId, Position>
   field: FieldElement[][]
 }
 
@@ -76,10 +75,10 @@ export namespace Field {
 
   export function update(
     field: Field,
-    vector: Vector,
+    pos: Position,
     updating: ((element: FieldElement) => FieldElement),
   ): Field {
-    const { x, y } = vector
+    const { x, y } = pos
     const currentElement = field.field[y][x]
     const updatedElement = updating(currentElement)
     const updatedField = immutableUpdate(field, {
@@ -125,7 +124,7 @@ export namespace Field {
       elements: {
         $apply: (elements: Field["elements"]) => immutableUpdate(elements, {
           [updatedElement]: {
-            $set: vector
+            $set: pos
           }
         })
       },
@@ -134,7 +133,7 @@ export namespace Field {
 
   export function getIntersections(
     field: Field,
-    pos: Vector,
+    pos: Position,
   ): ElementId[] {
     const intersects = new Array<ElementId>()
     const cols = field.field

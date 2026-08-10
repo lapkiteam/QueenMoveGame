@@ -155,25 +155,19 @@ describe("Field.getIntersections", () => {
       return Option2.get(result)
     })()
 
-    const elementId = ElementId.create(new Date(0))
-    const element = FieldElement.create(elementId)
-    const elementVector = { x: 1, y: 0 }
-    const width = 2
-    const height = 2
     expect(
-      Field.update(
-        Field.create(width, height),
-        elementVector,
-        _ => element,
-      )
+      Field.getIntersections(field, targetPosition).length
     )
-      .toStrictEqual({
-        elements: new Map([[elementId, elementVector]]),
-        field: (() => {
-          const field = Field.create(width, height).field
-          field[elementVector.y][elementVector.x] = elementId
-          return field
-        })(),
-      } as Field)
+      .toStrictEqual(
+        cols.reduce(
+          (count, rows) => rows.reduce(
+            (count, value) => (
+              value !== "I" ? count : count + 1
+            ),
+            count
+          ),
+          0,
+        )
+      )
   })
 })

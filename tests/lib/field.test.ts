@@ -8,11 +8,11 @@ import { ElementId, Field, FieldElement, Option2, Vector } from "../../src/lib/f
 export namespace ArrayExt {
   export function pick<T, U>(
     array: T[],
-    picking: (value: T, index?: number) => Option<U>,
+    picking: (value: T, index: number) => Option<U>,
   ): Option<U> {
     for (let index = 0; index < array.length; index++) {
       const element = array[index]
-      const result = picking(element)
+      const result = picking(element, index)
       if (result === undefined) {
         continue
       }
@@ -146,7 +146,7 @@ describe("Field.getIntersections", () => {
     const targetPosition = (() => {
       const result = ArrayExt.pick(cols, (rows, y) => (
         ArrayExt.pick(rows, (value, x) => {
-          if (value !== "I") {
+          if (value !== "x") {
             return
           }
           return Option.mkSome({ x, y } as Vector)

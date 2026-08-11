@@ -1,6 +1,6 @@
 <script lang="ts">
   import { concat } from "../lib/utils"
-  import { ElementId, Field, FieldElement } from "../lib/field"
+  import { ElementId, Field, FieldElement, Intersections } from "../lib/field"
   const colsCount = 25
   const rowsCount = 25
   let field = Field.create(colsCount, rowsCount)
@@ -23,18 +23,19 @@
           "border",
           "border-gray-500",
           (() => {
-            const intersects = Field.getIntersections(field, { x, y }).length
-            return value ? (
-              "bg-white-900"
+            if (value) {
+              return "bg-white-900"
+            }
+            const intersects = Intersections.count(
+              Field.getIntersections(field, { x, y })
+            )
+            return intersects === 0 ? (
+              "bg-yellow-100"
             ) : (
-              intersects === 0 ? (
-                "bg-yellow-100"
+              intersects === 1 ? (
+                "bg-blue-700"
               ) : (
-                intersects === 1 ? (
-                  "bg-blue-400"
-                ) : (
-                  "bg-red-500"
-                )
+                "bg-red-500"
               )
             )
           })()

@@ -102,72 +102,65 @@ describe("Field.update", () => {
   })
 })
 
-describe("Field.getIntersections", () => {
-  it("counts", () => {
-    const cols: (" " | "I" | "x")[][] = [
-      ["I", " ", "I", " "],
-      [" ", " ", " ", "I"],
-      [" ", "I", "x", "I"],
-      [" ", "I", "I", "I"],
-    ]
+type IntersectionField = (" " | "I" | "x")[][]
 
-    const field = cols.reduce(
-      (state, rows, y) => (
-        rows.reduce(
-          (state, current, x) => (
-            (current === "I") ? (
-              immutableUpdate(state, {
-                field: {
-                  $apply: field =>
-                    Field.update(
-                      field,
-                      { x, y },
-                      _ => FieldElement.create(
-                        ElementId.create(new Date(state.id))
-                      )
-                    )
-                },
-                id: {
-                  $apply: id => id + 1
-                },
-              })
-            ) : (
-              state
-            )
-          ),
-          state
-        )
-      ), {
-        field: Field.create(cols[0].length, cols.length),
-        id: 0,
-      }
-    ).field
-
-    const targetPosition = (() => {
-      const result = ArrayExt.pick(cols, (rows, y) => (
-        ArrayExt.pick(rows, (value, x) => {
-          if (value !== "x") {
-            return
-          }
-          return Option.mkSome({ x, y } as Position)
-        })
-      ))
-      return Option2.get(result)
-    })()
-
-    expect(
-      Field.getIntersections(field, targetPosition).length
-    )
-      .toStrictEqual(
-        cols.reduce(
-          (count, rows) => rows.reduce(
-            (count, value) => (
-              value !== "I" ? count : count + 1
-            ),
-            count
-          ),
-          0,
-        )
+function getIntersection(cols: IntersectionField) {
+  const field = cols.reduce(
+    (state, rows, y) => (
+      rows.reduce(
+        (state, current, x) => (
+          (current === "I") ? (
+            immutableUpdate(state, {
+              field: {
+                $apply: field => Field.update(
+                  field,
+                  { x, y },
+                  _ => FieldElement.create(
+                    ElementId.create(new Date(state.id))
+                  )
+                )
+              },
+              id: {
+                $apply: id => id + 1
+              },
+            })
+          ) : (
+            state
+          )
+        ),
+        state
       )
+    ), {
+    field: Field.create(cols[0].length, cols.length),
+    id: 0,
+  }
+  ).field
+
+  const targetPosition = (() => {
+    const result = ArrayExt.pick(cols, (rows, y) => (
+      ArrayExt.pick(rows, (value, x) => {
+        if (value !== "x") {
+          return;
+        }
+        return Option.mkSome({ x, y } as Position);
+      })
+    ));
+    return Option2.get(result);
+  })()
+
+  return Field.getIntersections(field, targetPosition)
+}
+
+describe("Field.getIntersections", () => {
+  it("8 counts", () => {
+    expect(
+      getIntersection([
+        ["I", " ", "I", " "],
+        [" ", " ", " ", "I"],
+        [" ", "I", "x", "I"],
+        [" ", "I", "I", "I"],
+      ]).length
+    )
+      .toStrictEqual(8)
   })
 })

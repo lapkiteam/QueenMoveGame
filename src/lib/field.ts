@@ -145,21 +145,25 @@ export namespace Field {
     }
 
     // ↖ North West
-    for (let y = pos.y - 1; y >= 0; y--) {
+    for (
+      let x = pos.x - 1, y = pos.y - 1;
+      y >= 0 && x >= 0;
+      y--, x--
+    ) {
       const rows = cols[y]
-      for (let x = pos.x - 1; x >= 0; x--) {
-        const element = rows[x]
-        add(element)
-      }
+      const element = rows[x]
+      add(element)
     }
 
     // ↘ South East
-    for (let y = pos.y + 1; y < cols.length; y++) {
+    for (
+      let y = pos.y + 1, x = pos.x + 1;
+      y < cols.length && x < cols[0].length;
+      y++, x++
+    ) {
       const rows = cols[y]
-      for (let x = pos.x + 1; x < rows.length; x++) {
-        const element = rows[x]
-        add(element)
-      }
+      const element = rows[x]
+      add(element)
     }
 
     // ↑ Upwards
@@ -177,21 +181,25 @@ export namespace Field {
     }
 
     // ↗ North East
-    for (let y = pos.y - 1; y >= 0; y--) {
+    for (
+      let y = pos.y - 1, x = pos.x + 1;
+      y >= 0 && x < cols[0].length;
+      y--, x++
+    ) {
       const rows = cols[y]
-      for (let x = pos.x + 1; x < rows.length; x++) {
-        const element = rows[x]
-        add(element)
-      }
+      const element = rows[x]
+      add(element)
     }
 
     // ↙ South West
-    for (let y = pos.y + 1; y < cols.length; y++) {
+    for (
+      let y = pos.y + 1, x = pos.x - 1;
+      y < cols.length && x >= 0;
+      y++, x--
+    ) {
       const rows = cols[y]
-      for (let x = pos.x - 1; x >= 0; x--) {
-        const element = rows[x]
-        add(element)
-      }
+      const element = rows[x]
+      add(element)
     }
 
     // ← Leftwards

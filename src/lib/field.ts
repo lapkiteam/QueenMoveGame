@@ -49,6 +49,27 @@ export type Position = {
   y: number,
 }
 
+export type IntersectionPair = [ElementId, ElementId]
+
+export type Intersections = {
+  horizontal: Option<IntersectionPair>
+  vertical: Option<IntersectionPair>
+  leftTopRightBottom: Option<IntersectionPair>
+  rightTopLeftBottom: Option<IntersectionPair>
+}
+
+export namespace Intersections {
+  export function count(intersects: Intersections): number {
+    const f = (pair: Option<IntersectionPair>) => (
+      Option.isSome(pair) ? 1 : 0
+    )
+    return f(intersects.horizontal)
+      + f(intersects.vertical)
+      + f(intersects.leftTopRightBottom)
+      + f(intersects.rightTopLeftBottom)
+  }
+}
+
 export type Field = {
   elements: Map<ElementId, Position>
   field: FieldElement[][]
@@ -134,92 +155,135 @@ export namespace Field {
   export function getIntersections(
     field: Field,
     pos: Position,
-  ): ElementId[] {
-    const intersects = new Array<ElementId>()
+  ): Intersections {
     const cols = field.field
-    function add(element: FieldElement) {
-      if (element === undefined) {
-        return
+
+    function combine(
+      fn1: () => Option<ElementId>,
+      fn2: () => Option<ElementId>
+    ): Option<IntersectionPair> {
+      const result1 = fn1()
+      if (result1 === undefined) {
+        return Option.mkNone()
       }
-      intersects.push(element)
+      const result2 = fn2()
+      if (result2 === undefined) {
+        return Option.mkNone()
+      }
+      return Option.mkSome([result1, result2])
     }
 
-    // ↖ North West
-    for (
-      let x = pos.x - 1, y = pos.y - 1;
-      y >= 0 && x >= 0;
-      y--, x--
-    ) {
-      const rows = cols[y]
-      const element = rows[x]
-      add(element)
+    /** ↖ North West */
+    function leftUp() {
+      for (
+        let x = pos.x - 1, y = pos.y - 1;
+        y >= 0 && x >= 0;
+        y--, x--
+      ) {
+        const element = cols[y][x]
+        if (element === undefined) {
+          continue
+        }
+        return element
+      }
     }
 
-    // ↘ South East
-    for (
-      let y = pos.y + 1, x = pos.x + 1;
-      y < cols.length && x < cols[0].length;
-      y++, x++
-    ) {
-      const rows = cols[y]
-      const element = rows[x]
-      add(element)
+    /** ↘ South East */
+    function rightDown() {
+      for (
+        let y = pos.y + 1, x = pos.x + 1;
+        y < cols.length && x < cols[0].length;
+        y++, x++
+      ) {
+        const element = cols[y][x]
+        if (element === undefined) {
+          continue
+        }
+        return element
+      }
     }
 
-    // ↑ Upwards
-    for (let y = pos.y - 1; y >= 0; y--) {
-      const rows = cols[y]
-      const element = rows[pos.x]
-      add(element)
+    /** ↑ Upwards */
+    function up() {
+      for (let y = pos.y - 1; y >= 0; y--) {
+        const element = cols[y][pos.x]
+        if (element === undefined) {
+          continue
+        }
+        return element
+      }
     }
 
-    // ↓ Downwards
-    for (let y = pos.y + 1; y < cols.length; y++) {
-      const rows = cols[y]
-      const element = rows[pos.x]
-      add(element)
+    /** ↓ Downwards */
+    function down() {
+      for (let y = pos.y + 1; y < cols.length; y++) {
+        const element = cols[y][pos.x]
+        if (element === undefined) {
+          continue
+        }
+        return element
+      }
     }
 
-    // ↗ North East
-    for (
-      let y = pos.y - 1, x = pos.x + 1;
-      y >= 0 && x < cols[0].length;
-      y--, x++
-    ) {
-      const rows = cols[y]
-      const element = rows[x]
-      add(element)
+    /** ↗ North East */
+    function rightUp() {
+      for (
+        let y = pos.y - 1, x = pos.x + 1;
+        y >= 0 && x < cols[0].length;
+        y--, x++
+      ) {
+        const element = cols[y][x]
+        if (element === undefined) {
+          continue
+        }
+        return element
+      }
     }
 
-    // ↙ South West
-    for (
-      let y = pos.y + 1, x = pos.x - 1;
-      y < cols.length && x >= 0;
-      y++, x--
-    ) {
-      const rows = cols[y]
-      const element = rows[x]
-      add(element)
+    /** ↙ South West */
+    function leftDown() {
+      for (
+        let y = pos.y + 1, x = pos.x - 1;
+        y < cols.length && x >= 0;
+        y++, x--
+      ) {
+        const element = cols[y][x]
+        if (element === undefined) {
+          continue
+        }
+        return element
+      }
     }
 
-    // ← Leftwards
-    {
+    /** ← Leftwards */
+    function left() {
       const rows = cols[pos.y]
       for (let x = pos.x - 1; x >= 0; x--) {
         const element = rows[x]
-        add(element)
+        if (element === undefined) {
+          continue
+        }
+        return element
       }
     }
 
-    // → Rightwards
-    {
+    /** → Rightwards */
+    function right() {
       const rows = cols[pos.y]
       for (let x = pos.x + 1; x < rows.length; x++) {
         const element = rows[x]
-        add(element)
+        if (element === undefined) {
+          continue
+        }
+        return element
       }
     }
 
-    return intersects
+    return {
+      leftTopRightBottom: combine(leftUp, rightDown),
+      vertical: combine(up, down),
+      horizontal: combine(left, right),
+      rightTopLeftBottom: combine(rightUp, leftDown),
+    }
   }
 }

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import { Option } from "@fering-org/functional-helper"
 import immutableUpdate from "immutability-helper";
 
-import { ElementId, Field, FieldElement, Option2, Position } from "../../src/lib/field"
+import { ElementId, Field, FieldElement, Intersections, Option2, Position } from "../../src/lib/field"
 
 // refactor: [feat(ArrayExt): add pick function #11](https://github.com/gretmn102/functional-helper/issues/11)
 export namespace ArrayExt {
@@ -102,21 +102,21 @@ describe("Field.update", () => {
   })
 })
 
-type IntersectionField = (" " | "I" | "x")[][]
+type IntersectionField = (" " | number | "x")[][]
 
 function getIntersection(cols: IntersectionField) {
   const field = cols.reduce(
     (state, rows, y) => (
       rows.reduce(
         (state, current, x) => (
-          (current === "I") ? (
+          (typeof current === "number") ? (
             immutableUpdate(state, {
               field: {
                 $apply: field => Field.update(
                   field,
                   { x, y },
                   _ => FieldElement.create(
-                    ElementId.create(new Date(state.id))
+                    ElementId.create(new Date(current))
                   )
                 )
               },
@@ -155,23 +155,49 @@ describe("Field.getIntersections", () => {
   it("8", () => {
     expect(
       getIntersection([
-        ["I", " ", "I", " "],
-        [" ", " ", " ", "I"],
-        [" ", "I", "x", "I"],
-        [" ", "I", "I", "I"],
-      ]).length
+        [ 1 , " ",  2 ,  3 ],
+        [" ", " ", " ",  4 ],
+        [" ",  5 , "x",  6 ],
+        [" ",  7 ,  8 ,  9 ],
+      ])
     )
-      .toStrictEqual(8)
+      .toStrictEqual({
+        horizontal: Option.mkSome(["5", "6"]),
+        vertical: Option.mkSome(["2", "8"]),
+        leftTopRightBottom: Option.mkSome(["1", "9"]),
+        rightTopLeftBottom: Option.mkSome(["4", "7"]),
+      } as Intersections)
   })
-  it("4", () => {
+  it("0", () => {
     expect(
       getIntersection([
-        ["I", " ", "I", " "],
-        ["x", " ", " ", "I"],
-        [" ", "I", " ", "I"],
-        [" ", "I", "I", "I"],
-      ]).length
+        [ 1 , " ",  2 ,  3 ],
+        ["x", " ", " ",  4 ],
+        [" ",  5 , " ",  6 ],
+        [" ",  7 ,  8 ,  9 ],
+      ])
     )
-      .toStrictEqual(4)
+      .toStrictEqual({
+        horizontal: Option.mkNone(),
+        vertical: Option.mkNone(),
+        leftTopRightBottom: Option.mkNone(),
+        rightTopLeftBottom: Option.mkNone(),
+      } as Intersections)
+  })
+  it("1", () => {
+    expect(
+      getIntersection([
+        [ 1 , "x",  2 ,  3 ],
+        [" ", " ", " ",  4 ],
+        [" ",  5 , " ",  6 ],
+        [" ",  7 ,  8 ,  9 ],
+      ])
+    )
+      .toStrictEqual({
+        horizontal: Option.mkSome(["1", "2"]),
+        vertical: Option.mkNone(),
+        leftTopRightBottom: Option.mkNone(),
+        rightTopLeftBottom: Option.mkNone(),
+      } as Intersections)
   })
 })

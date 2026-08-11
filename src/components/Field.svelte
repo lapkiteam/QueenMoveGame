@@ -1,8 +1,8 @@
 <script lang="ts">
   import { concat } from "../lib/utils"
   import { ElementId, Field, FieldElement, Intersections } from "../lib/field"
-  const colsCount = 25
-  const rowsCount = 25
+  const colsCount = 8
+  const rowsCount = 8
   let field = Field.create(colsCount, rowsCount)
 </script>
 

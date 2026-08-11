@@ -22,20 +22,22 @@
           "aspect-square",
           "border",
           "border-gray-500",
-          value ? (
-            "bg-white-900"
-          ) : (
-            Field.getIntersections(field, { x, y }).length === 0 ? (
-              "bg-yellow-100"
+          (() => {
+            const intersects = Field.getIntersections(field, { x, y }).length
+            return value ? (
+              "bg-white-900"
             ) : (
-              Field.getIntersections(field, { x, y }).length === 1 ? (
-                "bg-blue-500"
+              intersects === 0 ? (
+                "bg-yellow-100"
               ) : (
-                "bg-red-500"
+                intersects === 1 ? (
+                  "bg-blue-400"
+                ) : (
+                  "bg-red-500"
+                )
               )
             )
-          ),
-
+          })()
         ])}
         on:click={_ => {
           field = Field.update(

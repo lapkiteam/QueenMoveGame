@@ -52,8 +52,6 @@
           )
         }}
       >
-        <!-- <div>{x}, {y}</div> -->
-        <!-- <div>{Field.getIntersections(field, { x, y })}</div> -->
       </button>
     {/each}
   {/each}

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { concat } from "../lib/utils"
   import { ElementId, Field, FieldElement } from "../lib/field"
-  const colsCount = 8
-  const rowsCount = 8
+  const colsCount = 25
+  const rowsCount = 25
   let field = Field.create(colsCount, rowsCount)
 </script>
 
@@ -11,7 +11,6 @@
     "grid",
     "size-full",
     "aspect-square",
-    "gap-1",
   ])}
   style={`grid-template-columns: repeat(${colsCount}, minmax(0, 1fr))`}
 >
@@ -21,7 +20,8 @@
         class={concat([
           "bg-gray-500",
           "aspect-square",
-          "grid-flow-row",
+          "border",
+          "border-gray-500",
           value ? (
             "bg-white-900"
           ) : (
@@ -49,8 +49,8 @@
           )
         }}
       >
-        <div>{x}, {y}</div>
-        <div>{Field.getIntersections(field, { x, y })}</div>
+        <!-- <div>{x}, {y}</div> -->
+        <!-- <div>{Field.getIntersections(field, { x, y })}</div> -->
       </button>
     {/each}
   {/each}

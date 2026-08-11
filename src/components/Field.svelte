@@ -33,7 +33,7 @@
               "bg-yellow-100"
             ) : (
               intersects === 1 ? (
-                "bg-blue-700"
+                "bg-red-400"
               ) : (
                 "bg-red-500"
               )

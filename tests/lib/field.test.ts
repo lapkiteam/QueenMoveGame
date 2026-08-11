@@ -104,54 +104,60 @@ describe("Field.update", () => {
 
 type IntersectionField = (" " | number | "x")[][]
 
-function getIntersection(cols: IntersectionField) {
-  const field = cols.reduce(
-    (state, rows, y) => (
-      rows.reduce(
-        (state, current, x) => (
-          (typeof current === "number") ? (
-            immutableUpdate(state, {
-              field: {
-                $apply: field => Field.update(
-                  field,
-                  { x, y },
-                  _ => FieldElement.create(
-                    ElementId.create(new Date(current))
+namespace IntersectionField {
+  export function parse(cols: IntersectionField) {
+    const field = cols.reduce(
+      (state, rows, y) => (
+        rows.reduce(
+          (state, current, x) => (
+            (typeof current === "number") ? (
+              immutableUpdate(state, {
+                field: {
+                  $apply: field => Field.update(
+                    field,
+                    { x, y },
+                    _ => FieldElement.create(
+                      ElementId.create(new Date(current))
+                    )
                   )
-                )
-              },
-              id: {
-                $apply: id => id + 1
-              },
-            })
-          ) : (
-            state
-          )
-        ),
-        state
-      )
-    ), {
-    field: Field.create(cols[0].length, cols.length),
-    id: 0,
+                },
+                id: {
+                  $apply: id => id + 1
+                },
+              })
+            ) : (
+              state
+            )
+          ),
+          state
+        )
+      ), {
+      field: Field.create(cols[0].length, cols.length),
+      id: 0,
+    }
+    ).field
+
+    const targetPosition = (() => {
+      const result = ArrayExt.pick(cols, (rows, y) => (
+        ArrayExt.pick(rows, (value, x) => {
+          if (value !== "x") {
+            return;
+          }
+          return Option.mkSome({ x, y } as Position);
+        })
+      ));
+      return Option2.get(result);
+    })()
+
+    return { field, targetPosition }
   }
-  ).field
-
-  const targetPosition = (() => {
-    const result = ArrayExt.pick(cols, (rows, y) => (
-      ArrayExt.pick(rows, (value, x) => {
-        if (value !== "x") {
-          return;
-        }
-        return Option.mkSome({ x, y } as Position);
-      })
-    ));
-    return Option2.get(result);
-  })()
-
-  return Field.getIntersectBetweens(field, targetPosition)
 }
 
 describe("Field.getIntersectBetweens", () => {
+  const getIntersection = (intersectField) => {
+    const { field, targetPosition } = IntersectionField.parse(intersectField)
+    return Field.getIntersectBetweens(field, targetPosition)
+  }
   it("8", () => {
     expect(
       getIntersection([
@@ -199,5 +205,44 @@ describe("Field.getIntersectBetweens", () => {
         leftTopRightBottom: Option.mkNone(),
         rightTopLeftBottom: Option.mkNone(),
       } as IntersectBetweens)
+  })
+})
+
+describe("Field.getIntersections", () => {
+  const getIntersection = (intersectField) => {
+    const { field, targetPosition } = IntersectionField.parse(intersectField)
+    return Field.getIntersections(field, targetPosition)
+  }
+  it("8", () => {
+    expect(
+      getIntersection([
+        [ 1 , " ",  2 ,  3 ],
+        [" ", " ", " ",  4 ],
+        [" ",  5 , "x",  6 ],
+        [" ",  7 ,  8 ,  9 ],
+      ])
+    )
+      .toStrictEqual([
+        "1", "9", // \
+        "2", "8", // vertical
+        "4", "7", // /
+        "5", "6", // horizontal
+      ])
+  })
+  it("4", () => {
+    expect(
+      getIntersection([
+        [ 1 , " ",  2 ,  3 ],
+        [" ", " ", " ",  4 ],
+        ["x",  5 , " ",  6 ],
+        [" ",  7 ,  8 ,  9 ],
+      ])
+    )
+      .toStrictEqual([
+        "7",      // \
+        "1",      // vertical
+        "2",      // /
+        "5", "6", // horizontal
+      ])
   })
 })

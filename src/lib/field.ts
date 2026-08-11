@@ -286,4 +286,96 @@ export namespace Field {
       rightTopLeftBottom: combine(rightUp, leftDown),
     }
   }
+
+  export function getIntersections(
+    field: Field,
+    pos: Position,
+  ): ElementId[] {
+    const intersects = new Array<ElementId>()
+    const cols = field.field
+    function add(element: FieldElement) {
+      if (element === undefined) {
+        return
+      }
+      intersects.push(element)
+    }
+
+    // ↖ North West
+    for (
+      let x = pos.x - 1, y = pos.y - 1;
+      y >= 0 && x >= 0;
+      y--, x--
+    ) {
+      const rows = cols[y]
+      const element = rows[x]
+      add(element)
+    }
+
+    // ↘ South East
+    for (
+      let y = pos.y + 1, x = pos.x + 1;
+      y < cols.length && x < cols[0].length;
+      y++, x++
+    ) {
+      const rows = cols[y]
+      const element = rows[x]
+      add(element)
+    }
+
+    // ↑ Upwards
+    for (let y = pos.y - 1; y >= 0; y--) {
+      const rows = cols[y]
+      const element = rows[pos.x]
+      add(element)
+    }
+
+    // ↓ Downwards
+    for (let y = pos.y + 1; y < cols.length; y++) {
+      const rows = cols[y]
+      const element = rows[pos.x]
+      add(element)
+    }
+
+    // ↗ North East
+    for (
+      let y = pos.y - 1, x = pos.x + 1;
+      y >= 0 && x < cols[0].length;
+      y--, x++
+    ) {
+      const rows = cols[y]
+      const element = rows[x]
+      add(element)
+    }
+
+    // ↙ South West
+    for (
+      let y = pos.y + 1, x = pos.x - 1;
+      y < cols.length && x >= 0;
+      y++, x--
+    ) {
+      const rows = cols[y]
+      const element = rows[x]
+      add(element)
+    }
+
+    // ← Leftwards
+    {
+      const rows = cols[pos.y]
+      for (let x = pos.x - 1; x >= 0; x--) {
+        const element = rows[x]
+        add(element)
+      }
+    }
+
+    // → Rightwards
+    {
+      const rows = cols[pos.y]
+      for (let x = pos.x + 1; x < rows.length; x++) {
+        const element = rows[x]
+        add(element)
+      }
+    }
+
+    return intersects
+  }
 }

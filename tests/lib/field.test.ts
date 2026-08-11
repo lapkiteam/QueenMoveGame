@@ -152,7 +152,7 @@ function getIntersection(cols: IntersectionField) {
 }
 
 describe("Field.getIntersections", () => {
-  it("8 counts", () => {
+  it("8", () => {
     expect(
       getIntersection([
         ["I", " ", "I", " "],
@@ -162,5 +162,16 @@ describe("Field.getIntersections", () => {
       ]).length
     )
       .toStrictEqual(8)
+  })
+  it("4", () => {
+    expect(
+      getIntersection([
+        ["I", " ", "I", " "],
+        ["x", " ", " ", "I"],
+        [" ", "I", " ", "I"],
+        [" ", "I", "I", "I"],
+      ]).length
+    )
+      .toStrictEqual(4)
   })
 })

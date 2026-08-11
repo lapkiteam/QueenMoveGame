@@ -1,6 +1,6 @@
 <script lang="ts">
   import { concat } from "../lib/utils"
-  import { ElementId, Field, FieldElement, Intersections } from "../lib/field"
+  import { ElementId, Field, FieldElement, IntersectBetweens } from "../lib/field"
   const colsCount = 8
   const rowsCount = 8
   let field = Field.create(colsCount, rowsCount)
@@ -26,8 +26,8 @@
             if (value) {
               return "bg-white-900"
             }
-            const intersects = Intersections.count(
-              Field.getIntersections(field, { x, y })
+            const intersects = IntersectBetweens.count(
+              Field.getIntersectBetweens(field, { x, y })
             )
             return intersects === 0 ? (
               "bg-yellow-100"

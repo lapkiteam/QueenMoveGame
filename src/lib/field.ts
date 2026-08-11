@@ -49,18 +49,18 @@ export type Position = {
   y: number,
 }
 
-export type IntersectionPair = [ElementId, ElementId]
+export type IntersectBetweensPair = [ElementId, ElementId]
 
-export type Intersections = {
-  horizontal: Option<IntersectionPair>
-  vertical: Option<IntersectionPair>
-  leftTopRightBottom: Option<IntersectionPair>
-  rightTopLeftBottom: Option<IntersectionPair>
+export type IntersectBetweens = {
+  horizontal: Option<IntersectBetweensPair>
+  vertical: Option<IntersectBetweensPair>
+  leftTopRightBottom: Option<IntersectBetweensPair>
+  rightTopLeftBottom: Option<IntersectBetweensPair>
 }
 
-export namespace Intersections {
-  export function count(intersects: Intersections): number {
-    const f = (pair: Option<IntersectionPair>) => (
+export namespace IntersectBetweens {
+  export function count(intersects: IntersectBetweens): number {
+    const f = (pair: Option<IntersectBetweensPair>) => (
       Option.isSome(pair) ? 1 : 0
     )
     return f(intersects.horizontal)
@@ -152,16 +152,16 @@ export namespace Field {
     })
   }
 
-  export function getIntersections(
+  export function getIntersectBetweens(
     field: Field,
     pos: Position,
-  ): Intersections {
+  ): IntersectBetweens {
     const cols = field.field
 
     function combine(
       fn1: () => Option<ElementId>,
       fn2: () => Option<ElementId>
-    ): Option<IntersectionPair> {
+    ): Option<IntersectBetweensPair> {
       const result1 = fn1()
       if (result1 === undefined) {
         return Option.mkNone()

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 import { Option } from "@fering-org/functional-helper"
 import immutableUpdate from "immutability-helper";
 
-import { ElementId, Field, FieldElement, Intersections, Option2, Position } from "../../src/lib/field"
+import { ElementId, Field, FieldElement, IntersectBetweens, Option2, Position } from "../../src/lib/field"
 
 // refactor: [feat(ArrayExt): add pick function #11](https://github.com/gretmn102/functional-helper/issues/11)
 export namespace ArrayExt {
@@ -148,10 +148,10 @@ function getIntersection(cols: IntersectionField) {
     return Option2.get(result);
   })()
 
-  return Field.getIntersections(field, targetPosition)
+  return Field.getIntersectBetweens(field, targetPosition)
 }
 
-describe("Field.getIntersections", () => {
+describe("Field.getIntersectBetweens", () => {
   it("8", () => {
     expect(
       getIntersection([
@@ -166,7 +166,7 @@ describe("Field.getIntersections", () => {
         vertical: Option.mkSome(["2", "8"]),
         leftTopRightBottom: Option.mkSome(["1", "9"]),
         rightTopLeftBottom: Option.mkSome(["4", "7"]),
-      } as Intersections)
+      } as IntersectBetweens)
   })
   it("0", () => {
     expect(
@@ -182,7 +182,7 @@ describe("Field.getIntersections", () => {
         vertical: Option.mkNone(),
         leftTopRightBottom: Option.mkNone(),
         rightTopLeftBottom: Option.mkNone(),
-      } as Intersections)
+      } as IntersectBetweens)
   })
   it("1", () => {
     expect(
@@ -198,6 +198,6 @@ describe("Field.getIntersections", () => {
         vertical: Option.mkNone(),
         leftTopRightBottom: Option.mkNone(),
         rightTopLeftBottom: Option.mkNone(),
-      } as Intersections)
+      } as IntersectBetweens)
   })
 })

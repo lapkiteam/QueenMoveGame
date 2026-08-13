@@ -1,6 +1,14 @@
 <script lang="ts">
   import { concat } from "../lib/utils"
-  import { ElementId, Field, FieldElement, IntersectBetweens } from "../lib/field"
+  import { ElementId, Field, FieldElement, IntersectBetweens, type Position } from "../lib/field"
+
+  export let added: (((id: ElementId, pos: Position) => void) | undefined) = undefined
+  export let removed: (((id: ElementId, pos: Position) => void) | undefined) = undefined
+
+  function modified(element: FieldElement, pos: Position) {
+    if (element === )
+  }
+
   const colsCount = 8
   const rowsCount = 8
   let field = Field.create(colsCount, rowsCount)
@@ -52,6 +60,7 @@
           })()
         ])}
         on:click={_ => {
+          // modified()
           field = Field.update(
             field,
             { x, y },

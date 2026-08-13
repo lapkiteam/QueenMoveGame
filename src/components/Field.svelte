@@ -1,6 +1,10 @@
 <script lang="ts">
   import { concat } from "../lib/utils"
-  import { ElementId, Field, FieldElement, IntersectBetweens } from "../lib/field"
+  import { ElementId, Field, FieldElement, IntersectBetweens, type Position } from "../lib/field"
+
+  export let added: (((id: ElementId, pos: Position) => void) | undefined) = undefined
+  export let removed: (((id: ElementId, pos: Position) => void) | undefined) = undefined
+
   const colsCount = 8
   const rowsCount = 8
   let field = Field.create(colsCount, rowsCount)
@@ -53,7 +57,7 @@
               })()
             ])}
             on:click={_ => {
-              field = Field.update(
+              const { changes, updatedField } = Field.update(
                 field,
                 { x, y },
                 element => element ? (
@@ -61,7 +65,27 @@
                 ) : (
                   FieldElement.create(ElementId.create())
                 )
-              ).updatedField
+              );
+              (() => {
+                switch (changes.case) {
+                  case "NotChanges":
+                  case "Replaced":
+                    return
+
+                  case "Added":
+                    if (added === undefined)
+                      return
+                    added(changes.fields, { x, y })
+                    return
+
+                  case "Removed":
+                    if (removed === undefined)
+                      return
+                    removed(changes.fields, { x, y })
+                    return
+                }
+              })()
+              field = updatedField
             }}
           >
           </button>

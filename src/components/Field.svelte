@@ -21,7 +21,18 @@
           "bg-gray-500",
           "aspect-square",
           "border",
-          "border-gray-500",
+          ...(() => {
+            if (value === undefined) {
+              return ["border-gray-500"]
+            }
+            if (Field.getIntersections(field, { x, y }).length === 0) {
+              return ["border-gray-500"]
+            }
+            return [
+              "border-red-500",
+              "border-2",
+            ]
+          })(),
           (() => {
             if (value) {
               return "bg-white-900"

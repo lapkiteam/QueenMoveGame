@@ -23,10 +23,10 @@
               "border",
               ...(() => {
                 if (value === undefined) {
-                  return ["border-gray-500"]
+                  return ["border-gray-800"]
                 }
                 if (Field.getIntersections(field, { x, y }).length === 0) {
-                  return ["border-gray-500"]
+                  return ["border-gray-800"]
                 }
                 return [
                   "border-red-500",
@@ -35,7 +35,7 @@
               })(),
               (() => {
                 if (value) {
-                  return "bg-white-900"
+                  return "bg-gray-800"
                 }
                 const intersects = IntersectBetweens.count(
                   Field.getIntersectBetweens(field, { x, y })
@@ -44,7 +44,7 @@
                   if (Field.getIntersections(field, { x, y }).length === 0) {
                     return "bg-yellow-100"
                   }
-                  return "bg-gray-800"
+                  return "bg-white-900"
                 }
                 if (intersects === 1) {
                   return "bg-red-400"

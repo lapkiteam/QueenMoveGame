@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { Option } from "@fering-org/functional-helper"
+import { Option, UnionCase } from "@fering-org/functional-helper"
 import immutableUpdate from "immutability-helper";
 
 import { ElementId, Field, FieldElement, IntersectBetweens, Option2, Position } from "../../src/lib/field"
@@ -37,13 +37,16 @@ describe("Field.update", () => {
       )
     )
       .toStrictEqual({
-        elements: new Map([[elementId, elementPos]]),
-        field: (() => {
-          const field = Field.create(width, height).field
-          field[elementPos.y][elementPos.x] = elementId
-          return field
-        })(),
-      } as Field)
+        changes: UnionCase.mkUnionCase("Added", elementId),
+        field: {
+          elements: new Map([[elementId, elementPos]]),
+          field: (() => {
+            const field = Field.create(width, height).field
+            field[elementPos.y][elementPos.x] = elementId
+            return field
+          })(),
+        },
+      } as ReturnType<typeof Field.update>)
   })
   it("remove element", () => {
     const elementId = ElementId.create(new Date(0))
@@ -57,15 +60,18 @@ describe("Field.update", () => {
           Field.create(width, height),
           elementPos,
           _ => element,
-        ),
+        ).field,
         elementPos,
         _ => Option.mkNone(),
       )
     )
       .toStrictEqual({
-        elements: new Map(),
-        field: Field.create(width, height).field,
-      } as Field)
+        changes: UnionCase.mkUnionCase("Removed", elementId),
+        field: {
+          elements: new Map(),
+          field: Field.create(width, height).field,
+        },
+      } as ReturnType<typeof Field.update>)
   })
   it("replace old element to new element", () => {
     const element1 = FieldElement.create(
@@ -74,6 +80,7 @@ describe("Field.update", () => {
     const element2 = FieldElement.create(
       ElementId.create(new Date(1))
     )
+    const element1Id = FieldElement.getValue(element1)
     const element2Id = FieldElement.getValue(element2)
     const elementPos = { x: 1, y: 0 }
     const width = 2
@@ -84,21 +91,27 @@ describe("Field.update", () => {
           Field.create(width, height),
           elementPos,
           _ => element1,
-        ),
+        ).field,
         elementPos,
         _ => element2,
       )
     )
       .toStrictEqual({
-        elements: new Map([
-          [element2Id, elementPos]
-        ]),
-        field: (() => {
-          const field = Field.create(width, height).field
-          field[elementPos.y][elementPos.x] = element2Id
-          return field
-        })(),
-      } as Field)
+        changes: UnionCase.mkUnionCase("Replaced", {
+          current: element1,
+          new: element2,
+        }),
+        field: {
+          elements: new Map([
+            [element2Id, elementPos]
+          ]),
+          field: (() => {
+            const field = Field.create(width, height).field
+            field[elementPos.y][elementPos.x] = element2Id
+            return field
+          })(),
+        },
+      } as ReturnType<typeof Field.update>)
   })
 })
 
@@ -119,7 +132,7 @@ namespace IntersectionField {
                     _ => FieldElement.create(
                       ElementId.create(new Date(current))
                     )
-                  )
+                  ).field
                 },
                 id: {
                   $apply: id => id + 1

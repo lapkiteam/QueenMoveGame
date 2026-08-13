@@ -15,5 +15,8 @@
   "text-white",
 ])}>
   <div>Расставлено фигур {elementsCount} из 8</div>
-  <Field />
+  <Field
+    added={() => { elementsCount++ }}
+    removed={() => { elementsCount-- }}
+  />
 </main>

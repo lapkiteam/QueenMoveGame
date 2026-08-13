@@ -10,7 +10,12 @@
   let field = Field.create(colsCount, rowsCount)
 </script>
 
-<div style="aspect-ratio: {colsCount / rowsCount};">
+<div
+  class={concat([
+    "overflow-auto",
+  ])}
+  style="aspect-ratio: {colsCount / rowsCount};"
+>
   <div
     class={concat([
       "grid",

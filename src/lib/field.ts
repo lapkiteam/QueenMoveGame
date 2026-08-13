@@ -49,6 +49,12 @@ export type Position = {
   y: number,
 }
 
+export type UpdateChanges =
+  | UnionCase<"NotChanges">
+  | UnionCase<"Added", ElementId>
+  | UnionCase<"Removed", ElementId>
+  | UnionCase<"Replaced", { current: ElementId, new: ElementId }>
+
 export type IntersectBetweensPair = [ElementId, ElementId]
 
 export type IntersectBetweens = {
@@ -98,7 +104,10 @@ export namespace Field {
     field: Field,
     pos: Position,
     updating: ((element: FieldElement) => FieldElement),
-  ): Field {
+  ): {
+    changes: UpdateChanges
+    updatedField: Field
+  } {
     const { x, y } = pos
     const currentElement = field.field[y][x]
     const updatedElement = updating(currentElement)
@@ -116,39 +125,59 @@ export namespace Field {
 
     if (updatedElement === undefined) {
       if (currentElement === undefined) {
-        return updatedField
+        return {
+          changes: UnionCase.mkEmptyUnionCase("NotChanges"),
+          updatedField: updatedField,
+        }
       }
-      return immutableUpdate(updatedField, {
-        elements: {
-          $apply: (elements: Field["elements"]) => immutableUpdate(elements, {
-            $remove: [currentElement]
-          })
-        },
-      })
+      return {
+        changes: UnionCase.mkUnionCase("Removed", currentElement),
+        updatedField: immutableUpdate(updatedField, {
+          elements: {
+            $apply: (elements: Field["elements"]) => immutableUpdate(elements, {
+              $remove: [currentElement]
+            })
+          },
+        }),
+      }
     }
 
-    const updatedField2 = (() => {
+    const updatedField2: ReturnType<typeof update> = (() => {
       if (currentElement === undefined) {
-        return updatedField
+        return {
+          changes: UnionCase.mkUnionCase("Added", updatedElement) as UpdateChanges,
+          updatedField: updatedField,
+        }
       }
       if (currentElement === updatedElement) {
-        return updatedField
-      }
-      return immutableUpdate(updatedField, {
-        elements: {
-          $remove: [currentElement]
+        return {
+          changes: UnionCase.mkEmptyUnionCase("NotChanges") as UpdateChanges,
+          updatedField: updatedField,
         }
-      })
+      }
+      return {
+        changes: UnionCase.mkUnionCase("Replaced", {
+          current: currentElement,
+          new: updatedElement,
+        }) as UpdateChanges,
+        updatedField: immutableUpdate(updatedField, {
+          elements: {
+            $remove: [currentElement]
+          }
+        }),
+      }
     })()
 
     return immutableUpdate(updatedField2, {
-      elements: {
-        $apply: (elements: Field["elements"]) => immutableUpdate(elements, {
-          [updatedElement]: {
-            $set: pos
-          }
-        })
-      },
+      updatedField: {
+        elements: {
+          $apply: (elements: Field["elements"]) => immutableUpdate(elements, {
+            [updatedElement]: {
+              $set: pos
+            }
+          })
+        },
+      }
     })
   }
 

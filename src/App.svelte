@@ -13,13 +13,5 @@
   "bg-gray-800",
   "text-white",
 ])}>
-  <div class={concat([
-    "aspect-square",
-  ])}>
-    <div class={concat([
-      "aspect-square",
-    ])}>
-      <Field />
-    </div>
-  </div>
+  <Field />
 </main>

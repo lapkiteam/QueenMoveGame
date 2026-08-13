@@ -61,7 +61,7 @@
                 ) : (
                   FieldElement.create(ElementId.create())
                 )
-              )
+              ).updatedField
             }}
           >
           </button>

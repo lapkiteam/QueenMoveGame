@@ -11,86 +11,84 @@
 </script>
 
 <div style="aspect-ratio: {colsCount / rowsCount};">
-  <div style="aspect-ratio: {colsCount / rowsCount};">
-    <div
-      class={concat([
-        "grid",
-      ])}
-      style={`grid-template-columns: repeat(${colsCount}, minmax(0, 1fr))`}
-    >
-      {#each field.field as rows, y}
-        {#each rows as value, x}
-          <button
-            class={concat([
-              "bg-gray-500",
-              "aspect-square",
-              "border",
-              ...(() => {
-                if (value === undefined) {
-                  return ["border-gray-800"]
-                }
+  <div
+    class={concat([
+      "grid",
+    ])}
+    style={`grid-template-columns: repeat(${colsCount}, minmax(0, 1fr))`}
+  >
+    {#each field.field as rows, y}
+      {#each rows as value, x}
+        <button
+          class={concat([
+            "bg-gray-500",
+            "aspect-square",
+            "border",
+            ...(() => {
+              if (value === undefined) {
+                return ["border-gray-800"]
+              }
+              if (Field.getIntersections(field, { x, y }).length === 0) {
+                return ["border-gray-800"]
+              }
+              return [
+                "border-red-500",
+                "border-2",
+              ]
+            })(),
+            (() => {
+              if (value) {
+                return "bg-gray-800"
+              }
+              const intersects = IntersectBetweens.count(
+                Field.getIntersectBetweens(field, { x, y })
+              )
+              if (intersects === 0) {
                 if (Field.getIntersections(field, { x, y }).length === 0) {
-                  return ["border-gray-800"]
+                  return "bg-yellow-100"
                 }
-                return [
-                  "border-red-500",
-                  "border-2",
-                ]
-              })(),
-              (() => {
-                if (value) {
-                  return "bg-gray-800"
-                }
-                const intersects = IntersectBetweens.count(
-                  Field.getIntersectBetweens(field, { x, y })
-                )
-                if (intersects === 0) {
-                  if (Field.getIntersections(field, { x, y }).length === 0) {
-                    return "bg-yellow-100"
-                  }
-                  return "bg-white-900"
-                }
-                if (intersects === 1) {
-                  return "bg-red-400"
-                }
-                return "bg-red-500"
-              })()
-            ])}
-            on:click={_ => {
-              const { changes, updatedField } = Field.update(
-                field,
-                { x, y },
-                element => element ? (
-                  FieldElement.create()
-                ) : (
-                  FieldElement.create(ElementId.create())
-                )
-              );
-              (() => {
-                switch (changes.case) {
-                  case "NotChanges":
-                  case "Replaced":
-                    return
+                return "bg-white-900"
+              }
+              if (intersects === 1) {
+                return "bg-red-400"
+              }
+              return "bg-red-500"
+            })()
+          ])}
+          on:click={_ => {
+            const { changes, updatedField } = Field.update(
+              field,
+              { x, y },
+              element => element ? (
+                FieldElement.create()
+              ) : (
+                FieldElement.create(ElementId.create())
+              )
+            );
+            (() => {
+              switch (changes.case) {
+                case "NotChanges":
+                case "Replaced":
+                  return
 
-                  case "Added":
-                    if (added === undefined)
-                      return
-                    added(changes.fields, { x, y })
+                case "Added":
+                  if (added === undefined)
                     return
+                  added(changes.fields, { x, y })
+                  return
 
-                  case "Removed":
-                    if (removed === undefined)
-                      return
-                    removed(changes.fields, { x, y })
+                case "Removed":
+                  if (removed === undefined)
                     return
-                }
-              })()
-              field = updatedField
-            }}
-          >
-          </button>
-        {/each}
+                  removed(changes.fields, { x, y })
+                  return
+              }
+            })()
+            field = updatedField
+          }}
+        >
+        </button>
       {/each}
-    </div>
+    {/each}
   </div>
 </div>

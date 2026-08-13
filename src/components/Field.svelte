@@ -9,8 +9,6 @@
 <div
   class={concat([
     "grid",
-    "size-full",
-    "aspect-square",
   ])}
   style={`grid-template-columns: repeat(${colsCount}, minmax(0, 1fr))`}
 >

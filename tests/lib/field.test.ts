@@ -38,7 +38,7 @@ describe("Field.update", () => {
     )
       .toStrictEqual({
         changes: UnionCase.mkUnionCase("Added", elementId),
-        field: {
+        updatedField: {
           elements: new Map([[elementId, elementPos]]),
           field: (() => {
             const field = Field.create(width, height).field
@@ -60,14 +60,14 @@ describe("Field.update", () => {
           Field.create(width, height),
           elementPos,
           _ => element,
-        ).field,
+        ).updatedField,
         elementPos,
         _ => Option.mkNone(),
       )
     )
       .toStrictEqual({
         changes: UnionCase.mkUnionCase("Removed", elementId),
-        field: {
+        updatedField: {
           elements: new Map(),
           field: Field.create(width, height).field,
         },
@@ -91,7 +91,7 @@ describe("Field.update", () => {
           Field.create(width, height),
           elementPos,
           _ => element1,
-        ).field,
+        ).updatedField,
         elementPos,
         _ => element2,
       )
@@ -101,7 +101,7 @@ describe("Field.update", () => {
           current: element1,
           new: element2,
         }),
-        field: {
+        updatedField: {
           elements: new Map([
             [element2Id, elementPos]
           ]),
@@ -132,7 +132,7 @@ namespace IntersectionField {
                     _ => FieldElement.create(
                       ElementId.create(new Date(current))
                     )
-                  ).field
+                  ).updatedField
                 },
                 id: {
                   $apply: id => id + 1

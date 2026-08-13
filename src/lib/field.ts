@@ -106,7 +106,7 @@ export namespace Field {
     updating: ((element: FieldElement) => FieldElement),
   ): {
     changes: UpdateChanges
-    field: Field
+    updatedField: Field
   } {
     const { x, y } = pos
     const currentElement = field.field[y][x]
@@ -127,12 +127,12 @@ export namespace Field {
       if (currentElement === undefined) {
         return {
           changes: UnionCase.mkEmptyUnionCase("NotChanges"),
-          field: updatedField,
+          updatedField: updatedField,
         }
       }
       return {
         changes: UnionCase.mkUnionCase("Removed", currentElement),
-        field: immutableUpdate(updatedField, {
+        updatedField: immutableUpdate(updatedField, {
           elements: {
             $apply: (elements: Field["elements"]) => immutableUpdate(elements, {
               $remove: [currentElement]
@@ -142,17 +142,17 @@ export namespace Field {
       }
     }
 
-    const updatedField2 = (() => {
+    const updatedField2: ReturnType<typeof update> = (() => {
       if (currentElement === undefined) {
         return {
           changes: UnionCase.mkUnionCase("Added", updatedElement) as UpdateChanges,
-          field: updatedField,
+          updatedField: updatedField,
         }
       }
       if (currentElement === updatedElement) {
         return {
           changes: UnionCase.mkEmptyUnionCase("NotChanges") as UpdateChanges,
-          field: updatedField,
+          updatedField: updatedField,
         }
       }
       return {
@@ -160,7 +160,7 @@ export namespace Field {
           current: currentElement,
           new: updatedElement,
         }) as UpdateChanges,
-        field: immutableUpdate(updatedField, {
+        updatedField: immutableUpdate(updatedField, {
           elements: {
             $remove: [currentElement]
           }
@@ -169,7 +169,7 @@ export namespace Field {
     })()
 
     return immutableUpdate(updatedField2, {
-      field: {
+      updatedField: {
         elements: {
           $apply: (elements: Field["elements"]) => immutableUpdate(elements, {
             [updatedElement]: {

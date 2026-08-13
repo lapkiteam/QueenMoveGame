@@ -41,7 +41,10 @@
                   Field.getIntersectBetweens(field, { x, y })
                 )
                 if (intersects === 0) {
-                  return "bg-yellow-100"
+                  if (Field.getIntersections(field, { x, y }).length === 0) {
+                    return "bg-yellow-100"
+                  }
+                  return "bg-gray-800"
                 }
                 if (intersects === 1) {
                   return "bg-red-400"

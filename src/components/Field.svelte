@@ -40,15 +40,13 @@
                 const intersects = IntersectBetweens.count(
                   Field.getIntersectBetweens(field, { x, y })
                 )
-                return intersects === 0 ? (
-                  "bg-yellow-100"
-                ) : (
-                  intersects === 1 ? (
-                    "bg-red-400"
-                  ) : (
-                    "bg-red-500"
-                  )
-                )
+                if (intersects === 0) {
+                  return "bg-yellow-100"
+                }
+                if (intersects === 1) {
+                  return "bg-red-400"
+                }
+                return "bg-red-500"
               })()
             ])}
             on:click={_ => {
